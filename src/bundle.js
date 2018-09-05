@@ -3,6 +3,18 @@ import Event from './event.js'
 let historyTime = 0 // 历史数据 第一条数据的 时间撮  往前加载历史数据需要 这个时间撮
 let lastResolution = null // 上一次的 K线周期
 
+
+function dtFormat (time) {
+    const date = new Date(time)
+    const Y = date.getFullYear()
+    const M = (date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1)
+    const D = (date.getDate() < 10 ? `0${date.getDate()}` : date.getDate())
+    const h = (date.getHours() < 10 ? `0${date.getHours()}` : date.getHours())
+    const m = (date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes())
+    const s = (date.getSeconds() < 10 ? `0${date.getSeconds()}` : date.getSeconds())
+    return `${Y}-${M}-${D} ${h}:${m}:${s}`
+  }
+
 var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
         function (d, b) { for (var p in b) { if (b.hasOwnProperty(p)) { d[p] = b[p]; } } };
@@ -737,6 +749,7 @@ export default class UDFCompatibleDatafeedBase {
           let meta = {noData: false}
           const bars = []
           if (data.data.length) {
+            console.log(data.data)
             historyTime = data.data[0].id - 1
             for (let i = 0; i < data.data.length; i += 1) {
               bars.push({
@@ -754,44 +767,16 @@ export default class UDFCompatibleDatafeedBase {
           onResult(bars, meta)
         }
       })
-
-      // socket.openSocket({
-      //   args: [`candle.${this.getApiTime(resolution)}.btcusdt`, 1441, historyTime],
-      //   cmd: 'req',
-      //   id: '0a0493f7-80d4-4d1a-9d98-6da9ae9d399e'
-      // }, `candle.${this.getApiTime(resolution)}.btcusdt`, data => {
-      //   lastResolution = resolution // 把上一次请求的k线周期 保存下来
-      //   let meta = {noData: false}
-      //   const bars = []
-      //   if (data.length) {
-      //     historyTime = data[0].id - 1
-      //     for (let i = 0; i < data.length; i += 1) {
-      //       bars.push({
-      //         time: data[i].id * 1000,
-      //         close: data[i].close,
-      //         open: data[i].open,
-      //         high: data[i].high,
-      //         low: data[i].low,
-      //         volume: data[i].count
-      //       })
-      //     }
-      //   } else {
-      //     meta = {noData: true}
-      //   }
-      //   console.log(bars, meta)
-      //   onResult(bars, meta)
-      // })
-
-    //   console.log(result.bars)
-    //   onResult(result.bars, result.meta)
-    // }).catch(onError)
   }
 
   subscribeBars (symbolInfo, resolution, onTick, listenerGuid, onResetCacheNeededCallback) {
     // onResetCacheNeededCallback()
     // this._dataPulseProvider.subscribeBars(symbolInfo, resolution, onTick, listenerGuid)
+    Event.off('realTime')
+    
     Event.on('realTime', data => {
       if (Object.prototype.toString.call(data) === '[object Object]' && data.hasOwnProperty('open')) {
+        console.log(dtFormat(data.id * 1000))
         onTick({
           time: data.id * 1000,
           close: data.close,

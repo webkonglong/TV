@@ -19,7 +19,7 @@ const socket = {
       !history && this.sendWsRequest({
         args: [this.marketName],
         cmd: 'sub',
-        id : '1621570e-78a8-4413-997a-eedced6c55e0'
+        id : 'fd0823a5-e16b-4f46-8b68-3fd723beb321'
       })
     } else {
       this.lastMarke = market
@@ -33,7 +33,7 @@ const socket = {
       this.sendWsRequest({
         args: [this.marketName],
         cmd: 'sub',
-        id : '1621570e-78a8-4413-997a-eedced6c55e0'
+        id : 'fd0823a5-e16b-4f46-8b68-3fd723beb321'
       })
     }
     this.socket.onmessage = resp => {
