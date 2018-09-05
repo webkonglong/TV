@@ -36,6 +36,7 @@ class App extends Component {
   			// drawings_access: { type: 'black', tools: [ { name: "Regression Trend" } ] },
   			disabled_features: ["context_menus", "use_localstorage_for_settings", "border_around_the_chart", "left_toolbar", "header_symbol_search", "header_resolutions", "header_interval_dialog_button", "show_interval_dialog_on_key_press", "header_chart_type", "header_settings", "header_indicators", "header_compare", "header_undo_redo", "header_fullscreen_button", "header_saveload", "header_screenshot", "timeframes_toolbar", "go_to_date", "volume_force_overlay"],
         enabled_features: ['hide_last_na_study_output'],
+        custom_css_url: "chart.css",
   			// preset: "mobile",
         studies_overrides: {
           "volume.volume.color.0": "#ff5353",
