@@ -25,7 +25,7 @@ class App extends Component {
     window.TradingView.onready(() => {
       widget = new window.TradingView.widget({
         fullscreen: true,
-  			symbol: 'AAPL',
+  			symbol: 'BTC/USDT',
         timezone: "Asia/Shanghai", // 时区api参考https://b.aitrade.ga/books/tradingview/book/Symbology.html#timezone
   			interval: "1", // 1
   			container_id: "tv_chart_container",
@@ -42,7 +42,7 @@ class App extends Component {
   changeInterval (cycle) {
     console.log(cycle)
     if (cycle === '1R') {
-      widget.setSymbol('ETC/ETH', 1, () => {
+      widget.setSymbol('ETH/USDT', 1, () => {
         console.log('切换产品成功了???')
       })
     } else {

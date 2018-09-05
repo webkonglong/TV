@@ -12,7 +12,6 @@ const socket = {
     this.options = options
     this.marketName = market
     if (this.lastMarket) {
-      console.log(this.lastMarket, this.lastMarket, this.lastMarket, this.lastMarket, this.lastMarket, this.lastMarket, this.lastMarket)
       !history && this.sendWsRequest({
         args: [this.lastMarket],
         cmd: 'unsub'
