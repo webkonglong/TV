@@ -15,80 +15,8 @@ function dtFormat (time) {
     return `${Y}-${M}-${D} ${h}:${m}:${s}`
   }
 
-var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) { if (b.hasOwnProperty(p)) { d[p] = b[p]; } } };
-
-    function __extends(d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    }
-
 function logMessage (message) {
   console.log('%c ' + message,'background:#42c02e;color:#fff')
-}
-
-function getErrorMessage (error) {
-  if (error === undefined) {
-    return ''
-  } else if (typeof error === 'string') {
-    return error
-  }
-
-  return error.message
-}
-
-/*extractField*/
-
-function extractField (data, field, arrayIndex) {
-  const value = data[field]
-  return Array.isArray(value) ? value[arrayIndex] : value
-}
-
-/*SymbolsStorage*/
-
-class SymbolsStorage {
-  constructor (datafeedUrl, datafeedSupportedResolutions, requester) {
-    this._exchangesList = ['NYSE', 'FOREX', 'AMEX']
-    this._symbolsInfo = {}
-    this._symbolsList = []
-    this._datafeedUrl = datafeedUrl
-    this._datafeedSupportedResolutions = datafeedSupportedResolutions
-    this._requester = requester
-    this._readyPromise = this._init()
-    this._readyPromise.catch(error => {
-      console.error(`SymbolsStorage: 不能初始化, error= ${error.toString()}`)
-    })
-  }
-  // 注意 这个函数不考虑符号的交换。
-  resolveSymbol (symbolName) {
-    return this._readyPromise.then(() => {
-      return this._symbolsInfo[symbolName] === undefined ? Promise.reject('无效符号') : Promise.resolve(this._symbolsInfo[symbolName])
-    })
-  }
-
-  _init () {
-    const promises = [];
-    const alreadyRequestedExchanges = {}
-
-    for (let i = 0; i < this._exchangesList.length; i+= 1) {
-      if (alreadyRequestedExchanges[this._exchangesList[i]]) {
-        continue
-      }
-
-      alreadyRequestedExchanges[this._exchangesList[i]] = true
-    }
-
-    return Promise.all(promises).then(() => {
-      this._symbolsList.sort()
-    })
-  }
-}
-
-/*extractField$1*/
-function extractField$1(data, field, arrayIndex) {
-  return Array.isArray(data[field]) ? data[field][arrayIndex] : data[field]
 }
 
 function defaultConfiguration () {
@@ -100,29 +28,6 @@ function defaultConfiguration () {
     supports_timescale_marks: false
   }
 }
-
-/*报价提供者*/
-class QuotesProvider {
-  constructor (datafeedUrl, requester) {
-    this._datafeedUrl = datafeedUrl
-    this._requester = requester
-  }
-
-  getQuotes (symbols) {
-    return new Promise((resolve, reject) => {
-      this._requester.sendRequest(this._datafeedUrl, 'quotes', {symbols: symbols}).then(response => {
-        if (response.s === 'ok') {
-          resolve(response.d)
-        } else {
-          reject(response.errmsg)
-        }
-      }).catch(error => {
-        reject(`network error: ${getErrorMessage(error)}`)
-      })
-    })
-  }
-}
-
 
 /*请求*/
 
@@ -163,108 +68,14 @@ export default class UDFCompatibleDatafeedBase {
       updateFrequency = 10 * 1000
     }
     this._configuration = defaultConfiguration()
-    this._symbolsStorage = null
+    // this._symbolsStorage = null
     this._datafeedURL = datafeedURL
     this._requester = requester || new Requester()
-
-    this._quotesProvider = quotesProvider || new QuotesProvider()
-
     this._setupWithConfiguration(defaultConfiguration())
   }
 
   onReady (callback) {
     callback(this._configuration)
-  }
-
-  getQuotes (symbols, onDataCallback, onErrorCallback) {
-    this._quotesProvider.getQuotes(symbols).then(onDataCallback).catch(onErrorCallback)
-  }
-
-  subscribeQuotes (symbols, fastSymbols, onRealtimeCallback, listenerGuid) {
-  }
-
-  unsubscribeQuotes (listenerGuid) {
-  }
-
-  calculateHistoryDepth (resolution, resolutionBack, intervalBack) {
-    return undefined
-  }
-
-  getMarks (symbolInfo, startDate, endDate, onDataCallback, resolution) {
-    if (!this._configuration.supports_marks) {
-      return
-    }
-
-    const requestParams = {
-      symbol: symbolInfo.ticker || '',
-      from: startDate,
-      to: endDate,
-      resolution: resolution
-    }
-
-    this._send('marks', requestParams).then((response) => {
-      const result = []
-      if (!Array.isArray(response)) {
-        for (let i = 0; i < response.id.length; i += 1) {
-          result.push({
-            id: extractField$1(response, 'id', i),
-            time: extractField$1(response, 'time', i),
-            color: extractField$1(response, 'color', i),
-            text: extractField$1(response, 'text', i),
-            label: extractField$1(response, 'label', i),
-            labelFontColor: extractField$1(response, 'labelFontColor', i),
-            minSize: extractField$1(response, 'minSize', i)
-          })
-        }
-      }
-      onDataCallback(result)
-    }).catch(error => {
-      logMessage(`UdfCompatibleDatafeed: 请求marks失败 ${getErrorMessage(error)}`)
-      onDataCallback([])
-    })
-  }
-
-  getTimescaleMarks (symbolInfo, startDate, endDate, onDataCallback, resolution) {
-    if (!this._configuration.supports_timescale_marks) {
-      return
-    }
-
-    const requestParams = {
-      symbol: symbolInfo.ticker || '',
-      from: startDate,
-      to: endDate,
-      resolution: resolution
-    }
-
-    this._send('timescale_marks', requestParams).then(response => {
-      const result = []
-      if (!Array.isArray(response)) {
-        for (let i = 0; i < response.id.length; ++i) {
-          result.push({
-            id: extractField$1(response, 'id', i),
-            time: extractField$1(response, 'time', i),
-            color: extractField$1(response, 'color', i),
-            label: extractField$1(response, 'label', i),
-            tooltip: extractField$1(response, 'tooltip', i),
-          })
-        }
-      }
-      onDataCallback(response)
-    }).catch(error => {
-      logMessage(`UdfCompatibleDatafeed: 请求timescale_marks失败 ${getErrorMessage(error)}`)
-      onDataCallback([])
-    })
-  }
-
-  getServerTime (callback) {
-    if (!this._configuration.supports_time) {
-      return
-    }
-    this._send('time').then(response => {
-      !isNaN(parseInt(response)) && callback(parseInt(response))
-    }).catch(error => {
-      logMessage(`UdfCompatibleDatafeed 无法加载服务器时间 error=${getErrorMessage(error)}`)
-    })
   }
 
   resolveSymbol (symbolName, onResolve, onError) {
@@ -372,6 +183,7 @@ export default class UDFCompatibleDatafeedBase {
   }
 
   unsubscribeBars (listenerGuid) {
+    // listenerGuid === BTC/USTD_60
   }
 
   _send (urlPath, params) {
@@ -386,10 +198,6 @@ export default class UDFCompatibleDatafeedBase {
 
     if (!configurationData.supports_search && !configurationData.supports_group_request) {
       throw new Error('Unsupported datafeed 配置。必须支持搜索或支持组请求')
-    }
-
-    if (configurationData.supports_group_request || !configurationData.supports_search) {
-      this._symbolsStorage = new SymbolsStorage(this._datafeedURL, configurationData.supported_resolutions || [], this._requester);
     }
 
     logMessage(`初始化的 ${JSON.stringify(configurationData)}`)
