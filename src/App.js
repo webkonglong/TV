@@ -16,7 +16,8 @@ class App extends Component {
       H1: "60",
       H4: "240",
       H6: "360",
-      D1: "1D"
+      D1: "1D",
+      INDICATORS: "indicators"
     },
     activeCycle: '1'
   }
@@ -32,9 +33,44 @@ class App extends Component {
   			datafeed: new UDFCompatibleDatafeedBase("https://demo_feed.tradingview.com"),
   			library_path: "/charting_library/",
   			locale: "zh",
-  			drawings_access: { type: 'black', tools: [ { name: "Regression Trend" } ] },
-  			disabled_features: ["use_localstorage_for_settings"],
-  			preset: "mobile"
+  			// drawings_access: { type: 'black', tools: [ { name: "Regression Trend" } ] },
+  			disabled_features: ["context_menus", "use_localstorage_for_settings", "border_around_the_chart", "left_toolbar", "header_symbol_search", "header_resolutions", "header_interval_dialog_button", "show_interval_dialog_on_key_press", "header_chart_type", "header_settings", "header_indicators", "header_compare", "header_undo_redo", "header_fullscreen_button", "header_saveload", "header_screenshot", "timeframes_toolbar", "go_to_date", "volume_force_overlay"],
+        enabled_features: ['hide_last_na_study_output'],
+  			// preset: "mobile",
+        studies_overrides: {
+          "volume.volume.color.0": "#ff5353",
+          "volume.volume.color.1": "#00b07c",
+          "volume.volume.transparency": "53",
+          "volume.show ma": true,
+          "volume.volume ma.plottype": "line"
+        },
+        overrides: {
+          "mainSeriesProperties.showCountdown": false,
+          "volumePaneSize": "small",
+          "paneProperties.background": "#1f2b34",
+          "paneProperties.vertGridProperties.color": "#202d33",
+          "paneProperties.horzGridProperties.color": "#202d33",
+          "mainSeriesProperties.candleStyle.upColor": "#00b07c",
+          "mainSeriesProperties.candleStyle.downColor": "#ff5353",
+          "mainSeriesProperties.candleStyle.drawWick": true,
+          "mainSeriesProperties.candleStyle.drawBorder": false,
+          "mainSeriesProperties.candleStyle.borderUpColor": "#00b07c",
+          "mainSeriesProperties.candleStyle.borderDownColor": "#ff5353",
+          "mainSeriesProperties.candleStyle.wickUpColor": "#00b07c",
+          "mainSeriesProperties.candleStyle.wickDownColor": "#ff5353",
+          "mainSeriesProperties.candleStyle.barColorsOnPrevClose": false,
+          "mainSeriesProperties.areaStyle.color1": "rgba(39,56,68,.3)",
+          "mainSeriesProperties.areaStyle.color2": "rgba(39,56,68,.3)",
+          "mainSeriesProperties.areaStyle.linecolor": "#7291a1",
+          "mainSeriesProperties.areaStyle.linestyle": 0,
+          "mainSeriesProperties.areaStyle.linewidth": 1,
+          "mainSeriesProperties.areaStyle.priceSource": "close"
+        }
+      })
+
+      widget && widget.onChartReady && widget.onChartReady(() => {
+        widget.chart().createStudy('Moving Average', false, false, [7], null, {'Plot.linewidth': 2, 'Plot.color': '#2ba7d6'})
+        widget.chart().createStudy('Moving Average', false, false, [30], null, {'Plot.linewidth': 2, 'Plot.color': '#de9f66'})
       })
     })
   }
@@ -55,7 +91,6 @@ class App extends Component {
     const { interval, activeCycle } = this.state
     return (
       <div className="App">
-        <div id="tv_chart_container"></div>
         <div className="interval">
           {Object.keys(interval).map(item => (
             <div
@@ -67,6 +102,7 @@ class App extends Component {
             </div>
           ))}
         </div>
+        <div id="tv_chart_container"></div>
       </div>
     );
   }
