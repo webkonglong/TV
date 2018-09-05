@@ -773,10 +773,10 @@ export default class UDFCompatibleDatafeedBase {
     // onResetCacheNeededCallback()
     // this._dataPulseProvider.subscribeBars(symbolInfo, resolution, onTick, listenerGuid)
     Event.off('realTime')
-    
+
     Event.on('realTime', data => {
       if (Object.prototype.toString.call(data) === '[object Object]' && data.hasOwnProperty('open')) {
-        console.log(dtFormat(data.id * 1000))
+        console.log(dtFormat(data.id * 1000), data)
         onTick({
           time: data.id * 1000,
           close: data.close,

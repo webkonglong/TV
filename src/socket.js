@@ -8,11 +8,13 @@ const socket = {
   intervalObj: null, // 定时器的名字
   lastMarke: null,
   openSocket (options, market, history) {
+    console.log(market, 'market')
     this.options = options
     this.marketName = market
-    if (this.lastMarke) {
+    if (this.lastMarket) {
+      console.log(this.lastMarket, this.lastMarket, this.lastMarket, this.lastMarket, this.lastMarket, this.lastMarket, this.lastMarket)
       !history && this.sendWsRequest({
-        args: [this.lastMarke],
+        args: [this.lastMarket],
         cmd: 'unsub'
       })
       this.sendWsRequest(this.options)
@@ -22,7 +24,7 @@ const socket = {
         id : 'fd0823a5-e16b-4f46-8b68-3fd723beb321'
       })
     } else {
-      this.lastMarke = market
+      this.lastMarket = this.marketName
       this.socketOpen(options)
     }
   },
@@ -54,8 +56,8 @@ const socket = {
     console.log('depth-socket::close')
   },
   message (resp) {
-    const data = JSON.parse(resp.data.replace(/\r/g, '').replace(/\n/g, ''))
     this.lastMarket = this.marketName
+    const data = JSON.parse(resp.data.replace(/\r/g, '').replace(/\n/g, ''))
     Event.emit('realTime', data)
     Event.emit('data', data)
   },
