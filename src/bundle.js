@@ -29,49 +29,9 @@ function defaultConfiguration () {
   }
 }
 
-/*请求*/
-
-class Requester {
-  constructor (headers) {
-    if (headers) {
-      this._headers = headers
-    }
-  }
-
-  sendRequest (datafeedUrl, urlPath, params) {
-    if (params !== undefined) {
-      const paramKeys = Object.keys(params)
-      if (paramKeys.length !== 0) {
-        urlPath += '?';
-      }
-
-      urlPath += paramKeys.map(function (key) {
-        return encodeURIComponent(key) + "=" + encodeURIComponent(params[key].toString());
-      }).join('&')
-    }
-
-    const options = {credentials: 'same-origin'}
-
-    if (this._headers !== undefined) {
-      options.headers = this._headers
-    }
-
-    return fetch(`${datafeedUrl}/${urlPath}`, options).then(response => response.text()).then(responseTest => JSON.parse(responseTest))
-  }
-}
-
-/*UDFCompatibleDatafeedBase*/
-
 export default class UDFCompatibleDatafeedBase {
-  constructor (datafeedURL, quotesProvider, requester, updateFrequency) {
-    if (updateFrequency === void 0) {
-      updateFrequency = 10 * 1000
-    }
+  constructor (datafeedURL) {
     this._configuration = defaultConfiguration()
-    // this._symbolsStorage = null
-    this._datafeedURL = datafeedURL
-    this._requester = requester || new Requester()
-    this._setupWithConfiguration(defaultConfiguration())
   }
 
   onReady (callback) {
@@ -184,22 +144,5 @@ export default class UDFCompatibleDatafeedBase {
 
   unsubscribeBars (listenerGuid) {
     // listenerGuid === BTC/USTD_60
-  }
-
-  _send (urlPath, params) {
-    return this._requester.sendRequest(this._datafeedURL, urlPath, params)
-  }
-
-  _setupWithConfiguration (configurationData) {
-    this._configuration = configurationData
-    if (configurationData.exchanges === undefined) {
-      configurationData.exchanges = []
-    }
-
-    if (!configurationData.supports_search && !configurationData.supports_group_request) {
-      throw new Error('Unsupported datafeed 配置。必须支持搜索或支持组请求')
-    }
-
-    logMessage(`初始化的 ${JSON.stringify(configurationData)}`)
   }
 }
