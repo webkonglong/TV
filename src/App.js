@@ -77,11 +77,13 @@ class App extends Component {
   }
 
   changeInterval (cycle) {
-    console.log(cycle)
     if (cycle === '1R') {
       widget.setSymbol('ETH/USDT', 1, () => {
         console.log('切换产品成功了???')
       })
+    } else if (cycle === 'indicators') {
+      // 打开指标面板
+      widget.chart().executeActionById('insertIndicator')
     } else {
       widget.chart().setResolution(cycle)
       this.setState({ activeCycle: cycle })
