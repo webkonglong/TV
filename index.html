@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>kyubey</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="theme-color" content="#ffffff">
+  <!--封装了一个发布订阅模式-->
+  <script src="event.js"></script>
+  <!--图表库js-->
+  <script src="charting_library/charting_library.min.js"></script>
+  <!--websocket-->
+  <script src="websocket.js"></script>
+  <!--图表数据获取-->
+  <script src="datafeed.js"></script>
+  <!--图表配置-->
+  <script src="chartConfig.js"></script>
+</head>
+<style>
+  * {
+    padding: 0px;
+    margin: 0px;
+    box-sizing: border-box;
+  }
+
+  .root {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    padding-top: 200px;
+  }
+
+  .market {
+    position: absolute;
+    top: 80px;
+    height: 30px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .market span {
+    display: inline-block;
+    font-size: 14px;
+    height: 30px;
+    line-height: 30px;
+    cursor: pointer;
+    padding: 0 8px;
+    color: rgb(24, 149, 210);
+    border: 1px solid rgb(24, 149, 210);
+    border-radius: 3px;
+    margin-right: 10px;
+  }
+  
+  .market .active {
+    background-color: rgb(24, 149, 210);
+    border: none;
+    color: #fff;
+  }
+
+  .chart {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  /* 这个下面的css是 产品周期按钮的 */
+
+  .interval {
+    position: absolute;
+    left: 88px;
+    width: 100%;
+    height: 30px;
+    font-size: 0px;
+    text-align: left;
+    top: 5px;
+    z-index: 2;
+  }
+
+  .interval span {
+    display: inline-block;
+    padding: 0 10px;
+    margin-right: 4px;
+    height: 30px;
+    line-height: 30px;
+    color: #9194a4;
+    text-align: center;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .interval span:hover {
+    background-color: rgba(53, 116, 250, 0.12);
+  }
+
+  .interval .active {
+    background-color: rgba(53, 116, 250, 0.12);
+    color: #8194a4;
+  }
+
+
+
+
+  /* 这个下面的css重点关注，和k线图与关 */
+
+
+  #tv_chart_container {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+  }
+
+  iframe {
+    width: 100%;
+    height: 100% !important;
+  }
+</style>
+<body>
+  <div class="root">
+    <div id="market" class="market">
+      <span class="active">BTC/USDT</span>
+      <span>ETH/USDT</span>
+      <span>BCH/USDT</span>
+      <span>EOS/USDT</span>
+      <span>ETC/USDT</span>
+    </div>
+    <div class="chart">
+      <div class="interval" id="interval">
+        <span  class="active" data-value="1">M1</span>
+        <span data-value="3">M3</span>
+        <span data-value="5">M5</span>
+        <span data-value="15">M15</span>
+        <span data-value="30">M30</span>
+        <span data-value="60">H1</span>
+        <span data-value="240">H4</span>
+        <span data-value="360">H6</span>
+        <span data-value="1D">D1</span>
+      </div>
+      <div id="tv_chart_container"></div>
+    </div>
+  </div>
+  <!--页面总统js 初始化图表库 绑定点击事件等-->
+  <script src="index.js"></script>
+</body>
+</html>
