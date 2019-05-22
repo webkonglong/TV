@@ -40,7 +40,7 @@ var socket = {
     }
   },
   initWs () {
-    this.socket = new WebSocket('wss://api.fcoin.com/v2/ws')
+    this.socket = new WebSocket('wss://api.ifukang.com/v2/ws')
     this.socket.onopen = () => {
       this.sendWsRequest(this.historyData)
       this.sendWsRequest({
